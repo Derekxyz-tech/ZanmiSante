@@ -32,9 +32,6 @@ export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [chatsLoaded, setChatsLoaded] = useState(false);
 
-  // Track the last active chat id to update its title
-  const [lastActiveChatId, setLastActiveChatId] = useState<string | null>(null);
-
   // Track if a new chat should be created on login
   useEffect(() => {
     if (user && chatsLoaded) {
@@ -139,7 +136,6 @@ export default function Home() {
         setChats((prev) => prev.map((c) => c.id === activeChat.id ? { ...c, title } : c));
       }
     }
-    setLastActiveChatId(activeChat ? activeChat.id : null);
     const { data } = await supabase
       .from('chats')
       .insert([{ user_id: user.id, title: 'New Chat' }])
