@@ -208,14 +208,14 @@ export default function Home() {
         {/* Main content */}
         <div className={`flex-1 min-w-0 transition-all duration-300 ${sidebarCollapsed ? 'md:ml-0' : ''}`}>
           <div className="bg-white rounded-2xl shadow-lg">
-            <header className="flex items-center justify-between py-4 px-6 rounded-2xl shadow-md">
-              <div className="flex items-center gap-3">
+            <header className="flex items-center justify-between h-24 py-0 px-6 rounded-2xl shadow-md">
+              <div className="flex items-center gap-3 h-full">
                 <Image 
                   src="/image-removebg-preview (1).png" 
                   alt="ZanmiSanté Logo" 
-                  width={80} 
-                  height={80} 
-                  className="object-contain" 
+                  width={160} 
+                  height={96} 
+                  className="object-contain max-h-full max-w-full" 
                   priority
                 />
               </div>
