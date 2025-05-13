@@ -211,11 +211,11 @@ export default function Home() {
             <header className="flex items-center justify-between py-4 px-6 rounded-2xl shadow-md">
               <div className="flex items-center gap-3">
                 <Image 
-                  src="/Untitled_design-removebg-preview.png" 
+                  src="/image-removebg-preview (1).png" 
                   alt="ZanmiSanté Logo" 
                   width={80} 
                   height={80} 
-                  className="object-contain scale-125" 
+                  className="object-contain" 
                   priority
                 />
               </div>
@@ -272,7 +272,7 @@ export default function Home() {
                 <Bars3Icon className="h-6 w-6 text-emerald-600 dark:text-emerald-300" />
               </button>
             </div>
-            <Image src="/Untitled_design-removebg-preview.png" alt="ZanmiSanté Logo" width={112} height={112} className="w-28 h-28 object-contain mb-4" />
+            <Image src="/image-removebg-preview (1).png" alt="ZanmiSanté Logo" width={112} height={112} className="w-28 h-28 object-contain mb-4" />
             <h2 className="text-2xl font-bold text-emerald-800 dark:text-emerald-200 mb-6">ZanmiSanté</h2>
             <SignedIn>
               <button
@@ -335,7 +335,7 @@ export default function Home() {
           {!sidebarCollapsed && (
             <>
               <div className="flex-none flex flex-col items-center mb-2 w-full">
-                <Image src="/Untitled_design-removebg-preview.png" alt="ZanmiSanté Logo" width={112} height={112} className="w-28 h-28 object-contain mb-2" />
+                <Image src="/image-removebg-preview (1).png" alt="ZanmiSanté Logo" width={112} height={112} className="w-28 h-28 object-contain mb-2" />
                 <h2 className="text-2xl font-bold text-emerald-800 dark:text-emerald-200 mb-4">ZanmiSanté</h2>
                 <SignedIn>
                   <button
