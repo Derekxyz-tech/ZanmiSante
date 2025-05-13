@@ -208,8 +208,8 @@ export default function Home() {
         {/* Main content */}
         <div className={`flex-1 min-w-0 transition-all duration-300 ${sidebarCollapsed ? 'md:ml-0' : ''}`}>
           <div className="bg-white rounded-2xl shadow-lg">
-            <header className="flex items-center justify-between h-24 py-0 px-6 rounded-2xl shadow-md">
-              <div className="flex items-center gap-3 h-full">
+            <header className="flex items-center justify-between h-24 py-0 pr-6 pl-0 rounded-r-2xl shadow-md">
+              <div className="flex items-center h-full ml-[-12px]">
                 <Image 
                   src="/image-removebg-preview (1).png" 
                   alt="ZanmiSanté Logo" 
