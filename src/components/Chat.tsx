@@ -102,7 +102,7 @@ export default function Chat({ messages = [], onSendMessage, activeChat }: ChatP
     <div className="relative flex flex-col h-[calc(100vh-8rem)] bg-white rounded-2xl shadow-lg mx-auto w-full">
       <div className="flex-1 overflow-y-auto py-6 px-4 pb-32 space-y-6 scrollbar-hide scrollbar-hover">
         {messages.length === 0 && !typingMessage ? (
-          <div className="flex flex-col items-center justify-center h-full text-center text-black">
+          <div className="flex flex-col items-center justify-center h-full text-center text-black px-4">
             <div className="w-20 h-20 mb-3 flex items-center justify-center overflow-visible">
               <Image 
                 src="/Untitled_design-removebg-preview.png" 
