@@ -5,15 +5,31 @@ import { useState, useEffect } from 'react';
 import { Bars3Icon, XMarkIcon, ChevronLeftIcon, ChevronRightIcon, ArrowRightOnRectangleIcon, UserPlusIcon, PlusIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/solid';
 import { SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs';
 import Link from 'next/link';
+import Image from 'next/image';
 import { supabase } from '@/utils/supabaseClient';
+
+interface Chat {
+  id: string;
+  user_id: string;
+  title: string;
+  created_at: string;
+}
+
+interface Message {
+  id?: string;
+  chat_id?: string;
+  role: 'user' | 'assistant';
+  content: string;
+  created_at?: string;
+}
 
 export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { user } = useUser();
-  const [chats, setChats] = useState<any[]>([]);
-  const [activeChat, setActiveChat] = useState<any>(null);
-  const [messages, setMessages] = useState<any[]>([]);
+  const [chats, setChats] = useState<Chat[]>([]);
+  const [activeChat, setActiveChat] = useState<Chat | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
   // Track the last active chat id to update its title
   const [lastActiveChatId, setLastActiveChatId] = useState<string | null>(null);
   // Track if chats are loaded
@@ -124,7 +140,7 @@ export default function Home() {
       }
     }
     setLastActiveChatId(activeChat ? activeChat.id : null);
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('chats')
       .insert([{ user_id: user.id, title: 'New Chat' }])
       .select()
@@ -143,12 +159,12 @@ export default function Home() {
   };
 
   // Select a chat from history
-  const handleSelectChat = (chat: any) => {
+  const handleSelectChat = (chat: Chat) => {
     setActiveChat(chat);
   };
 
   // Unified message handler for Chat
-  const handleChatMessage = async (msg: any) => {
+  const handleChatMessage = async (msg: Message) => {
     if (user && activeChat) {
       // Save to Supabase
       const { data } = await supabase
@@ -171,7 +187,7 @@ export default function Home() {
           .update({ title })
           .eq('id', activeChat.id);
         setChats((prev) => prev.map((c) => c.id === activeChat.id ? { ...c, title } : c));
-        setActiveChat((prev: any) => prev ? { ...prev, title } : prev);
+        setActiveChat((prev) => prev ? { ...prev, title } : prev);
       }
     } else {
       setMessages((prev) => [...prev, msg]);
@@ -197,7 +213,14 @@ export default function Home() {
           <div className="bg-white rounded-2xl shadow-lg">
             <header className="flex items-center justify-between py-4 px-6 rounded-2xl shadow-md">
               <div className="flex items-center gap-3">
-                <img src="/image-removebg-preview (1).png" alt="ZanmiSanté Logo" className="w-16 h-16 object-contain scale-200" style={{overflow: 'visible'}} />
+                <Image 
+                  src="/image-removebg-preview (1).png" 
+                  alt="ZanmiSanté Logo" 
+                  width={64} 
+                  height={64} 
+                  className="object-contain scale-200" 
+                  style={{overflow: 'visible'}}
+                />
               </div>
               <div className="flex items-center gap-4">
                 <SignedOut>
@@ -252,7 +275,7 @@ export default function Home() {
                 <Bars3Icon className="h-6 w-6 text-emerald-600 dark:text-emerald-300" />
               </button>
             </div>
-            <img src="/Untitled_design-removebg-preview.png" alt="ZanmiSanté Logo" className="w-28 h-28 object-contain mb-4" />
+            <Image src="/Untitled_design-removebg-preview.png" alt="ZanmiSanté Logo" width={112} height={112} className="w-28 h-28 object-contain mb-4" />
             <h2 className="text-2xl font-bold text-emerald-800 dark:text-emerald-200 mb-6">ZanmiSanté</h2>
             <SignedIn>
               <button
@@ -315,7 +338,7 @@ export default function Home() {
           {!sidebarCollapsed && (
             <>
               <div className="flex-none flex flex-col items-center mb-2 w-full">
-                <img src="/Untitled_design-removebg-preview.png" alt="ZanmiSanté Logo" className="w-28 h-28 object-contain mb-2" />
+                <Image src="/Untitled_design-removebg-preview.png" alt="ZanmiSanté Logo" width={112} height={112} className="w-28 h-28 object-contain mb-2" />
                 <h2 className="text-2xl font-bold text-emerald-800 dark:text-emerald-200 mb-4">ZanmiSanté</h2>
                 <SignedIn>
                   <button

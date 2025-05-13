@@ -4,6 +4,16 @@ import { useState, useRef, useEffect } from 'react';
 import { PaperAirplaneIcon, ClipboardIcon, CheckIcon } from '@heroicons/react/24/solid';
 import { Message, generateResponse } from '@/utils/chat';
 import { cn } from '@/utils/cn';
+import Image from 'next/image';
+
+interface ChatProps {
+  messages?: Message[];
+  onSendMessage?: (msg: Message) => Promise<void> | void;
+  activeChat?: {
+    id: string;
+    title: string;
+  };
+}
 
 function cleanAsterisks(text: string) {
   // Remove trailing asterisks at the end of lines or after colons
@@ -26,11 +36,7 @@ function formatMessage(text: string) {
     .join('<br />');
 }
 
-export default function Chat({ messages = [], onSendMessage, activeChat }: {
-  messages?: Message[];
-  onSendMessage?: (msg: Message) => Promise<void> | void;
-  activeChat?: any;
-}) {
+export default function Chat({ messages = [], onSendMessage, activeChat }: ChatProps) {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
@@ -98,7 +104,13 @@ export default function Chat({ messages = [], onSendMessage, activeChat }: {
         {messages.length === 0 && !typingMessage ? (
           <div className="flex flex-col items-center justify-center h-full text-center text-black">
             <div className="w-20 h-20 mb-3 flex items-center justify-center overflow-visible">
-              <img src="/Untitled_design-removebg-preview.png" alt="ZanmiSanté Logo" className="w-full h-full object-contain scale-150" />
+              <Image 
+                src="/Untitled_design-removebg-preview.png" 
+                alt="ZanmiSanté Logo" 
+                width={80} 
+                height={80} 
+                className="object-contain scale-150" 
+              />
             </div>
             <h2 className="text-xl font-semibold mb-1">Welcome to ZanmiSanté</h2>
             <p className="max-w-md text-base">
