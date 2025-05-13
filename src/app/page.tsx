@@ -211,12 +211,12 @@ export default function Home() {
             <header className="flex items-center justify-between py-4 px-6 rounded-2xl shadow-md">
               <div className="flex items-center gap-3">
                 <Image 
-                  src="/image-removebg-preview (1).png" 
+                  src="/Untitled_design-removebg-preview.png" 
                   alt="ZanmiSanté Logo" 
-                  width={64} 
-                  height={64} 
-                  className="object-contain scale-200" 
-                  style={{overflow: 'visible'}}
+                  width={48} 
+                  height={48} 
+                  className="object-contain" 
+                  priority
                 />
               </div>
               <div className="flex items-center gap-4">
