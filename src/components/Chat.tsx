@@ -14,7 +14,7 @@ function formatMessage(text: string) {
   text = cleanAsterisks(text);
   return text
     .split('\n')
-    .map((line, i) => {
+    .map((line) => {
       // Format bold text
       let formattedLine = line.replace(/\*(.*?)\*/g, '<strong>$1</strong>');
       // Format italic text
@@ -26,11 +26,15 @@ function formatMessage(text: string) {
     .join('<br />');
 }
 
-export default function Chat() {
-  const [messages, setMessages] = useState<Message[]>([]);
+export default function Chat({ messages = [], onSendMessage, activeChat }: {
+  messages?: Message[];
+  onSendMessage?: (msg: Message) => Promise<void> | void;
+  activeChat?: any;
+}) {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [typingMessage, setTypingMessage] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -40,7 +44,7 @@ export default function Chat() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, typingMessage]);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -55,19 +59,28 @@ export default function Chat() {
     if (!input.trim() || isLoading) return;
 
     const userMessage: Message = { role: 'user', content: input.trim() };
-    setMessages(prev => [...prev, userMessage]);
+    if (onSendMessage) await onSendMessage(userMessage);
     setInput('');
     setIsLoading(true);
 
     try {
       const response = await generateResponse([...messages, userMessage]);
-      setMessages(prev => [...prev, { role: 'assistant', content: response }]);
+      // Typing effect
+      let current = '';
+      setTypingMessage('');
+      for (let i = 0; i < response.length; i++) {
+        current += response[i];
+        setTypingMessage(current);
+        await new Promise((res) => setTimeout(res, 8)); // Fast typing
+      }
+      setTypingMessage(null);
+      const assistantMessage: Message = { role: 'assistant', content: response };
+      if (onSendMessage) await onSendMessage(assistantMessage);
     } catch (error) {
       console.error('Error:', error);
-      setMessages(prev => [
-        ...prev,
-        { role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' },
-      ]);
+      setTypingMessage(null);
+      const assistantMessage: Message = { role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' };
+      if (onSendMessage) await onSendMessage(assistantMessage);
     } finally {
       setIsLoading(false);
     }
@@ -80,67 +93,79 @@ export default function Chat() {
   };
 
   return (
-    <div className="flex flex-col max-h-[70vh] min-h-[400px] bg-white/90 dark:bg-gray-900/80 rounded-2xl shadow-lg mx-auto mt-2 mb-8 w-full">
-      <div className="flex-1 overflow-y-auto px-2 sm:px-6 py-6 space-y-6">
-        {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center text-emerald-600 dark:text-emerald-300">
-            <div className="w-14 h-14 mb-3 text-emerald-400 dark:text-emerald-300">
-              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M24 44 Q29 29 44 24 Q29 19 24 4 Q19 19 4 24 Q19 29 24 44Z" fill="currentColor" />
-              </svg>
+    <div className="relative flex flex-col h-[calc(100vh-8rem)] bg-white rounded-2xl shadow-lg mx-auto w-full">
+      <div className="flex-1 overflow-y-auto py-6 px-4 pb-32 space-y-6 scrollbar-hide scrollbar-hover">
+        {messages.length === 0 && !typingMessage ? (
+          <div className="flex flex-col items-center justify-center h-full text-center text-black">
+            <div className="w-20 h-20 mb-3 flex items-center justify-center overflow-visible">
+              <img src="/Untitled_design-removebg-preview.png" alt="ZanmiSanté Logo" className="w-full h-full object-contain scale-150" />
             </div>
             <h2 className="text-xl font-semibold mb-1">Welcome to ZanmiSanté</h2>
             <p className="max-w-md text-base">
               Votre compagnon intelligent pour votre bien-être personnel!
             </p>
           </div>
-        ) : (
-          messages.map((message, index) => (
-            <div
-              key={index}
-              className={cn(
-                'flex w-full',
-                message.role === 'user' ? 'justify-end' : 'justify-start'
-              )}
-            >
+        ) :
+          <>
+            {messages.map((message, index) => (
               <div
+                key={index}
                 className={cn(
-                  'max-w-[85%] w-full sm:w-auto rounded-2xl px-4 py-3 mb-2 relative',
-                  message.role === 'user'
-                    ? 'bg-emerald-600 text-white shadow-md'
-                    : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-900 dark:text-emerald-100 shadow-sm'
+                  'flex w-full',
+                  message.role === 'user' ? 'justify-end' : 'justify-start'
                 )}
               >
-                <div 
-                  className="prose prose-sm dark:prose-invert max-w-none prose-emerald break-words"
-                  dangerouslySetInnerHTML={{ 
-                    __html: formatMessage(message.content)
-                  }}
-                />
-                {message.role === 'assistant' && (
-                  <div className="flex justify-end mt-2">
-                    <button
-                      onClick={() => handleCopy(message.content, index)}
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-100 dark:bg-emerald-800 hover:bg-emerald-200 dark:hover:bg-emerald-700 transition-colors text-emerald-700 dark:text-emerald-200 text-sm font-medium shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                      title="Copy answer"
-                    >
-                      {copiedIndex === index ? (
-                        <>
-                          <CheckIcon className="h-5 w-5" /> Copied!
-                        </>
-                      ) : (
-                        <>
-                          <ClipboardIcon className="h-5 w-5" /> Copy
-                        </>
-                      )}
-                    </button>
-                  </div>
-                )}
+                <div
+                  className={cn(
+                    'max-w-[85%] w-full sm:w-auto rounded-2xl px-4 py-3 mb-2 relative',
+                    message.role === 'user'
+                      ? 'bg-emerald-600 text-white shadow-md'
+                      : 'bg-emerald-200 dark:bg-emerald-800 text-emerald-900 dark:text-emerald-100 shadow-sm'
+                  )}
+                >
+                  <div 
+                    className="prose prose-sm dark:prose-invert max-w-none prose-emerald break-words"
+                    dangerouslySetInnerHTML={{ 
+                      __html: formatMessage(message.content)
+                    }}
+                  />
+                  {message.role === 'assistant' && (
+                    <div className="flex justify-end mt-2">
+                      <button
+                        onClick={() => handleCopy(message.content, index)}
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-green-600 hover:bg-green-700 transition-colors text-white text-sm font-medium shadow-md focus:outline-none focus:ring-2 focus:ring-green-400"
+                        title="Copy answer"
+                      >
+                        {copiedIndex === index ? (
+                          <>
+                            <CheckIcon className="h-5 w-5" /> Copied!
+                          </>
+                        ) : (
+                          <>
+                            <ClipboardIcon className="h-5 w-5" /> Copy
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))
-        )}
-        {isLoading && (
+            ))}
+            {typingMessage && (
+              <div className="flex w-full justify-start">
+                <div className="max-w-[85%] w-full sm:w-auto rounded-2xl px-4 py-3 mb-2 relative bg-emerald-200 dark:bg-emerald-800 text-emerald-900 dark:text-emerald-100 shadow-sm">
+                  <div
+                    className="prose prose-sm dark:prose-invert max-w-none prose-emerald break-words"
+                    dangerouslySetInnerHTML={{
+                      __html: formatMessage(typingMessage)
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+          </>
+        }
+        {isLoading && !typingMessage && (
           <div className="flex justify-start">
             <div className="bg-emerald-50 dark:bg-emerald-900/30 rounded-2xl px-4 py-3 shadow-sm">
               <div className="flex space-x-2">
@@ -154,8 +179,8 @@ export default function Chat() {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="px-2 sm:px-4 pb-4 w-full">
-        <form onSubmit={handleSubmit} className="flex gap-2 items-end bg-emerald-100 dark:bg-emerald-950/40 rounded-xl shadow-inner p-2 w-full">
+      <div className="absolute left-0 bottom-0 w-full px-2 sm:px-4 mb-4 bg-white">
+        <form onSubmit={handleSubmit} className="flex gap-2 items-end bg-emerald-100/60 dark:bg-emerald-950/30 rounded-2xl shadow-inner p-2 w-full">
           <textarea
             ref={inputRef}
             value={input}
@@ -167,7 +192,7 @@ export default function Chat() {
               }
             }}
             placeholder="Ask about health and wellness..."
-            className="flex-1 resize-none rounded-lg border-none bg-transparent p-3 focus:outline-none focus:ring-2 focus:ring-emerald-400 min-h-[44px] max-h-[120px] text-gray-900 dark:text-gray-100 text-base"
+            className="flex-1 resize-none rounded-lg border border-black bg-transparent p-3 focus:outline-none focus:ring-2 focus:ring-emerald-400 min-h-[44px] max-h-[120px] text-black text-base overflow-hidden"
             disabled={isLoading}
             rows={1}
           />
@@ -178,7 +203,8 @@ export default function Chat() {
               'p-3 rounded-lg bg-emerald-600 text-white',
               'hover:bg-emerald-700 transition-colors',
               'disabled:opacity-50 disabled:cursor-not-allowed',
-              'flex items-center justify-center shadow-md'
+              'flex items-center justify-center shadow-md',
+              'cursor-pointer'
             )}
             aria-label="Send"
           >

@@ -24,3 +24,41 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Hide scrollbar by default, show on hover */
+.scrollbar-hide {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Webkit */
+}
+.scrollbar-hover:hover {
+  scrollbar-width: thin;
+  -ms-overflow-style: auto;
+}
+.scrollbar-hover:hover::-webkit-scrollbar {
+  display: block;
+}
+
+/* Hide scrollbar by default, show on hover */
+.scrollbar-invisible {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+.scrollbar-invisible::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Webkit */
+}
+.scrollbar-invisible:hover {
+  scrollbar-width: thin;
+  scrollbar-color: #6ee7b7 transparent; /* emerald-300 */
+}
+.scrollbar-invisible:hover::-webkit-scrollbar {
+  display: block;
+  width: 6px;
+  background: transparent;
+}
+.scrollbar-invisible:hover::-webkit-scrollbar-thumb {
+  background: #6ee7b7;
+  border-radius: 6px;
+}
