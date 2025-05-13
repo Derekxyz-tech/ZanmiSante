@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { PaperAirplaneIcon, ClipboardIcon, CheckIcon } from '@heroicons/react/24/solid';
+import { PaperAirplaneIcon, ClipboardIcon, CheckIcon, StopIcon } from '@heroicons/react/24/solid';
 import { Message, generateResponse } from '@/utils/chat';
 import { cn } from '@/utils/cn';
 import Image from 'next/image';
@@ -43,13 +43,31 @@ export default function Chat({ messages = [], onSendMessage, activeChat }: ChatP
   const [typingMessage, setTypingMessage] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const [isAtBottom, setIsAtBottom] = useState(true);
+  const isUserScrollingRef = useRef(false);
+  const cancelTypingRef = useRef(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Track if user is at the bottom using onScroll
+  const handleScroll = () => {
+    const container = chatContainerRef.current;
+    if (!container) return;
+    const threshold = 40; // px from bottom to still count as "at bottom"
+    const atBottom = container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
+    setIsAtBottom(atBottom);
+    isUserScrollingRef.current = !atBottom;
+  };
+
   useEffect(() => {
-    scrollToBottom();
+    // Only scroll if user was at bottom before new message
+    if (isAtBottom) {
+      scrollToBottom();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages, typingMessage]);
 
   // Auto-resize textarea
@@ -68,6 +86,7 @@ export default function Chat({ messages = [], onSendMessage, activeChat }: ChatP
     if (onSendMessage) await onSendMessage(userMessage);
     setInput('');
     setIsLoading(true);
+    cancelTypingRef.current = false;
 
     try {
       const response = await generateResponse([...messages, userMessage]);
@@ -75,6 +94,9 @@ export default function Chat({ messages = [], onSendMessage, activeChat }: ChatP
       let current = '';
       setTypingMessage('');
       for (let i = 0; i < response.length; i++) {
+        if (cancelTypingRef.current) {
+          break;
+        }
         current += response[i];
         setTypingMessage(current);
         await new Promise((res) => setTimeout(res, 8)); // Fast typing
@@ -98,9 +120,20 @@ export default function Chat({ messages = [], onSendMessage, activeChat }: ChatP
     setTimeout(() => setCopiedIndex(null), 1500);
   };
 
+  const handleStop = () => {
+    cancelTypingRef.current = true;
+    setIsLoading(false);
+    setTypingMessage(null);
+    // Optionally, trigger a save here if needed (e.g., call onSendMessage or another save function)
+  };
+
   return (
     <div className="relative flex flex-col h-[calc(100vh-8rem)] bg-white rounded-2xl shadow-lg mx-auto w-full">
-      <div className="flex-1 overflow-y-auto py-6 px-4 pb-32 space-y-6 scrollbar-hide scrollbar-hover">
+      <div
+        className="flex-1 overflow-y-auto py-6 px-4 pb-32 space-y-6 scrollbar-hide scrollbar-hover"
+        ref={chatContainerRef}
+        onScroll={handleScroll}
+      >
         {messages.length === 0 && !typingMessage ? (
           <div className="flex flex-col items-center justify-center h-full text-center text-black px-4">
             <div className="w-20 h-20 mb-3 flex items-center justify-center overflow-visible">
@@ -206,23 +239,31 @@ export default function Chat({ messages = [], onSendMessage, activeChat }: ChatP
               }
             }}
             placeholder="Ask about health and wellness..."
-            className="flex-1 resize-none rounded-lg border border-black bg-transparent p-3 focus:outline-none focus:ring-2 focus:ring-emerald-400 min-h-[44px] max-h-[120px] text-black text-base overflow-hidden"
+            className="flex-1 resize-none rounded-lg border border-white bg-gray-900 p-3 focus:outline-none focus:ring-2 focus:ring-emerald-400 min-h-[44px] max-h-[120px] text-white text-base overflow-hidden"
             disabled={isLoading}
             rows={1}
           />
           <button
-            type="submit"
-            disabled={isLoading || !input.trim()}
+            type={isLoading ? "button" : "submit"}
+            disabled={isLoading ? false : !input.trim()}
+            onClick={isLoading ? handleStop : undefined}
             className={cn(
-              'p-3 rounded-lg bg-emerald-600 text-white',
-              'hover:bg-emerald-700 transition-colors',
+              'p-3 rounded-lg',
+              isLoading
+                ? 'bg-green-600 hover:bg-green-700 text-white'
+                : 'bg-emerald-600 text-white hover:bg-emerald-700',
+              'transition-colors',
               'disabled:opacity-50 disabled:cursor-not-allowed',
               'flex items-center justify-center shadow-md',
               'cursor-pointer'
             )}
-            aria-label="Send"
+            aria-label={isLoading ? "Stop" : "Send"}
           >
-            <PaperAirplaneIcon className="h-5 w-5" />
+            {isLoading ? (
+              <StopIcon className="h-5 w-5" />
+            ) : (
+              <PaperAirplaneIcon className="h-5 w-5" />
+            )}
           </button>
         </form>
       </div>
