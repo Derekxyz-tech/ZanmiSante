@@ -213,9 +213,9 @@ export default function Home() {
                 <Image 
                   src="/Untitled_design-removebg-preview.png" 
                   alt="ZanmiSanté Logo" 
-                  width={48} 
-                  height={48} 
-                  className="object-contain" 
+                  width={80} 
+                  height={80} 
+                  className="object-contain scale-125" 
                   priority
                 />
               </div>
