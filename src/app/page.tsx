@@ -8,6 +8,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { supabase } from '@/utils/supabaseClient';
 
+// Types for chat and message data
 interface Chat {
   id: string;
   user_id: string;
