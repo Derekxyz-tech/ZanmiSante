@@ -114,7 +114,7 @@ export default function Chat({ messages = [], onSendMessage, activeChat }: ChatP
             </div>
             <h2 className="text-xl font-semibold mb-1">Welcome to ZanmiSanté</h2>
             <p className="max-w-md text-base">
-              Votre compagnon intelligent pour votre bien-être personnel!
+              {activeChat ? `Chat: ${activeChat.title}` : 'Votre compagnon intelligent pour votre bien-être personnel!'}
             </p>
           </div>
         ) :
