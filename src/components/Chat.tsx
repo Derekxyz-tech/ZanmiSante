@@ -9,10 +9,6 @@ import Image from 'next/image';
 interface ChatProps {
   messages?: Message[];
   onSendMessage?: (msg: Message) => Promise<void> | void;
-  activeChat?: {
-    id: string;
-    title: string;
-  };
 }
 
 function cleanAsterisks(text: string) {
@@ -36,7 +32,7 @@ function formatMessage(text: string) {
     .join('<br />');
 }
 
-export default function Chat({ messages = [], onSendMessage, activeChat }: ChatProps) {
+export default function Chat({ messages = [], onSendMessage }: ChatProps) {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);

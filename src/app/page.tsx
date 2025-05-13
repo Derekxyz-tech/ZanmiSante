@@ -2,7 +2,7 @@
 
 import Chat from '@/components/Chat';
 import { useState, useEffect } from 'react';
-import { Bars3Icon, XMarkIcon, ChevronLeftIcon, ChevronRightIcon, ArrowRightOnRectangleIcon, UserPlusIcon, PlusIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/solid';
+import { Bars3Icon, ArrowRightOnRectangleIcon, UserPlusIcon, PlusIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/solid';
 import { SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -30,10 +30,10 @@ export default function Home() {
   const [chats, setChats] = useState<Chat[]>([]);
   const [activeChat, setActiveChat] = useState<Chat | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [chatsLoaded, setChatsLoaded] = useState(false);
+
   // Track the last active chat id to update its title
   const [lastActiveChatId, setLastActiveChatId] = useState<string | null>(null);
-  // Track if chats are loaded
-  const [chatsLoaded, setChatsLoaded] = useState(false);
 
   // Track if a new chat should be created on login
   useEffect(() => {
