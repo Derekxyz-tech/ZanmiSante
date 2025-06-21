@@ -209,18 +209,7 @@ export default function Home() {
         <div className={`flex-1 min-w-0 transition-all duration-300 ${sidebarCollapsed ? 'md:ml-0' : ''}`}>
           <div className="bg-white rounded-2xl shadow-lg">
             <header className="flex items-center justify-between h-24 py-0 pr-6 pl-0 rounded-r-2xl shadow-md">
-             
-              {/* Sidebar toggle for mobile */}
-              <button
-                className="md:hidden p-2 rounded-lg bg-emerald-200 dark:bg-emerald-800 hover:bg-emerald-300 dark:hover:bg-emerald-700 transition-colors"
-                onClick={() => setSidebarOpen(true)}
-                aria-label="Open sidebar"
-              >
-                <Bars3Icon className="h-6 w-6 text-emerald-600 dark:text-emerald-300" />
-              </button>
-            </header>
-          </div> 
-           <div className="flex items-center h-full ml-[-12px]">Add commentMore actions
+              <div className="flex items-center h-full ml-[-12px]">
                 <Image 
                   src="/image-removebg-preview (1).png" 
                   alt="ZanmiSanté Logo" 
@@ -234,10 +223,10 @@ export default function Home() {
                 <SignedOut>
                   <div className="flex flex-col md:flex-row gap-2 md:gap-4 items-stretch w-full">
                     <Link href="/sign-in" className="flex items-center gap-2 px-2 py-1 text-sm md:px-4 md:py-2 md:text-base rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-colors font-semibold shadow-md mb-2 md:mb-0">
-                      <ArrowRightOnRectangleIcon className="h-5 w-5" /> 
+                      <ArrowRightOnRectangleIcon className="h-5 w-5" /> Sign In
                     </Link>
                     <Link href="/sign-up" className="flex items-center gap-2 px-2 py-1 text-sm md:px-4 md:py-2 md:text-base rounded-lg bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors font-semibold shadow-md border border-emerald-300">
-                      <UserPlusIcon className="h-5 w-5" /> 
+                      <UserPlusIcon className="h-5 w-5" /> Sign Up
                     </Link>
                   </div>
                 </SignedOut>
@@ -245,7 +234,16 @@ export default function Home() {
                   <UserButton appearance={{ elements: { avatarBox: 'ring-2 ring-emerald-500' } }} />
                 </SignedIn>
               </div>
-              
+              {/* Sidebar toggle for mobile */}
+              <button
+                className="md:hidden p-2 rounded-lg bg-emerald-200 dark:bg-emerald-800 hover:bg-emerald-300 dark:hover:bg-emerald-700 transition-colors"
+                onClick={() => setSidebarOpen(true)}
+                aria-label="Open sidebar"
+              >
+                <Bars3Icon className="h-6 w-6 text-emerald-600 dark:text-emerald-300" />
+              </button>
+            </header>
+          </div>
           <div className="mt-2 bg-white rounded-2xl shadow-lg">
             <Chat
               messages={messages}
